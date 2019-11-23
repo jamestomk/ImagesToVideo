@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<!-- Configuration of the Ant build system to generate a Jar file -->
+<project name="Utilities" default="CreateJar">
+	<target name="CreateJar" description="Create Jar file">
+		<jar destfile="build/imageToVideo.jar" basedir="target/classes" description="build the binary deployment jar file">
+			<include name="com/optionpeer/graphics/ImagesToVideo.class" />
+			<zipfileset includes="**/*" src="libs/xuggle-xuggler-5.4.jar"/>
+			<zipfileset includes="**/*" src="${user.home}/.m2/repository/org/slf4j/slf4j-api/1.7.7/slf4j-api-1.7.7.jar"/>
+			<zipfileset includes="**/*" src="${user.home}/.m2/repository/org/slf4j/slf4j-jdk14/1.7.25/slf4j-jdk14-1.7.25.jar"/>
+				<zipfileset includes="**/*" src="${user.home}/.m2/repository/org/apache/ant/ant/1.8.2/ant-1.8.2.jar"/>
+			<manifest>
+				<attribute name="Main-Class" value="com.optionpeer.graphics.ImagesToVideo" />
+			</manifest>
+		</jar>
+		<zip destfile="build/imageToVideo-source.zip" basedir="." description="build the project source ZIP file">
+			<exclude name="build/**"/>
+			<exclude name="target/**"/>
+			<exclude name="bin/**"/>
+		</zip>
+	</target>
+	<!--
+	
+			<include name="src/com/optionpeer/graphics/ImagesToVideo.java" />
+			<include name="runImagesToVideo.bat" />
+			<include name="runImagesToVideo.sh" />
+			<include name="runImagesToVideoExample.bat" />
+				<include name="runImagesToVideoExample.sh" />
+			<include name="libs/xuggle-xuggler-5.4.jar" />
+	-->
+	<target name="install" description="install into programFiles/Java" depends="CreateJar">
+		<copy file="build/imageToVideo.jar" tofile="C:/Program Files/Java/imageToVideo.jar"/>
+	</target>
+
+	<target name="javadoc">
+		<javadoc access="protected" author="true" destdir="javadoc" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" 
+	        	source="1.8" sourcepath="src" 
+	       	splitindex="true" version="true"/>
+	</target>
+	<target depends="javadoc" description="build javadoc jar from javadoc files" name="package-docs">
+		<jar compress="true" destfile="build/optionpeer_utilities-javadoc.jar" basedir="javadoc" />
+		<delete dir="javadoc"/>
+	</target>
+</project>
