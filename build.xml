@@ -12,11 +12,16 @@
 				<attribute name="Main-Class" value="com.optionpeer.graphics.ImagesToVideo" />
 			</manifest>
 		</jar>
-		<zip destfile="build/imageToVideo-source.zip" basedir="." description="build the project source ZIP file">
-			<exclude name="build/**"/>
-			<exclude name="target/**"/>
-			<exclude name="bin/**"/>
-		</zip>
+			<zip destfile="build/imageToVideo_bin.zip" basedir="." description="build the project source ZIP file">
+				<include name="build/imageToVideo.jar"/>
+				<include name="_README.txt"/>
+				<include name="examples/**"/>
+			</zip>
+			<zip destfile="build/imageToVideo_source.zip" basedir="." description="build the project source ZIP file">
+				<exclude name="build/**"/>
+				<exclude name="target/**"/>
+				<exclude name="bin/**"/>
+			</zip>
 	</target>
 	<target name="install" description="install into programFiles/Java" depends="CreateJar">
 		<copy file="build/imageToVideo.jar" tofile="C:/Program Files/Java/imageToVideo.jar"/>
