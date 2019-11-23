@@ -18,15 +18,6 @@
 			<exclude name="bin/**"/>
 		</zip>
 	</target>
-	<!--
-	
-			<include name="src/com/optionpeer/graphics/ImagesToVideo.java" />
-			<include name="runImagesToVideo.bat" />
-			<include name="runImagesToVideo.sh" />
-			<include name="runImagesToVideoExample.bat" />
-				<include name="runImagesToVideoExample.sh" />
-			<include name="libs/xuggle-xuggler-5.4.jar" />
-	-->
 	<target name="install" description="install into programFiles/Java" depends="CreateJar">
 		<copy file="build/imageToVideo.jar" tofile="C:/Program Files/Java/imageToVideo.jar"/>
 	</target>
