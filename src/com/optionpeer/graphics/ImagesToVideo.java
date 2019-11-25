@@ -12,6 +12,12 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.tools.ant.DirectoryScanner;
 
 import com.xuggle.xuggler.ICodec;
@@ -21,18 +27,19 @@ import com.xuggle.xuggler.IRational;
  * @author Aryan Naim 
  * This class converts JPEG images to MPEG (.mp4) extension video using Xuggler library
  * examples of USAGE:
- * -r "C:/tmp/render/water lilies sculpture PhysCameraAbove h ????.jpg"  "C:/tmp/render/water lilies sculpture PhysCameraAbove h.avi"
+ * -r "C:/tmp/render/imgBasenam ????.jpg"  "C:/tmp/render/movieName.avi"
  * "C:/tmp/render/quay ????.jpg"  "C:/tmp/render/quay.avi"
  */
 public class ImagesToVideo {
 
-	private static final String USAGE = "USAGE: [-r] 'infile pattern' outputFileFullName.avi";
+	private final String USAGE = getClass().getSimpleName() + " [-r] 'infile pattern' outputFileFullName.avi";
 	private static final int DEFAULT_VIDEO_WIDTH = 1024;
 	private static final int DEFAULT_VIDEO_HEIGHT = 768;
 	private static final String COMBINING_FILES_MSG = "combining %d images files of pattern %s";
 	private static final String SETTING_WH_MSG = "setting video width=%d and height=%d";
 	private static final String START_PROC_MSG = "starting to process %d image files";
 	private static final String BAD_FILE = "convertJpegFramesToMpegVideo, file path: %s does not exist!";
+	private static Options options = new Options();		// command line options
 	//	public Logger logger = LoggerFactory.getLogger( this.getClass() );	// TODO: should use java-style logging
 	private static String imageFilenamePattern;
 	private static String aviFilename;
@@ -58,10 +65,31 @@ public class ImagesToVideo {
 		// optional "-r" param to remove image files
 		// first  req param is image file pattern format
 		// second req param is the output AVI file name
-		if ( (args.length < 2) || (args.length > 3) ) {
-			System.err.println( USAGE );
-			for( String arg : args )
-				System.err.println( arg + " " );
+		// create Options object
+
+		addAllCmdLineOptions();
+		CommandLineParser parser = new DefaultParser();
+		CommandLine cmd = null;
+		try {
+			cmd = parser.parse( options, args);
+		} catch ( ParseException e ) {
+			System.err.println( "Parsing failed.  Reason: " + e.getMessage() );
+			printUsage();
+		}
+		if(cmd.hasOption("help")) {
+			// automatically generate the help statement
+			printUsage();
+			System.exit(0);
+		}
+		if(cmd.hasOption("r")) {
+			System.out.println( "will remove image files as they are combined");
+			cleanUpOption = true;
+		}
+		
+		List<String> remainingArgs = cmd.getArgList();
+		
+		if ( remainingArgs.size() != 2 ) {
+			printUsage();
 			System.exit( -1 );
 		}
 		int i = 0;
@@ -81,10 +109,23 @@ public class ImagesToVideo {
 		else 
 			convertJpegFramesToMpegVideo();
 	}
+
+	private void printUsage() {
+		HelpFormatter formatter = new HelpFormatter();
+		formatter.printHelp( USAGE,  options );
+	}
 	
+	private void addAllCmdLineOptions() {
+		// add t option
+		options
+		.addOption( "help", "print this" )
+		.addOption( "r", false, "remove image files processed")
+		;
+	}
+
 	/**
 	 * scan a directory for filenames matching a pattern
-	 * @param fileNamePattern TODO
+	 * @param fileNamePattern a regex to match all image files in directory.  They need to ordinally sort.
 	 * @return
 	 */
   	private List<String> getFilenames(String fileNamePattern) {
